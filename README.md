@@ -13,11 +13,10 @@ We shall run our application on port 8080. To do that lets use the docker EXPOSE
 EXPOSE 8080
 
 The final Dockerfile should look like this:
-
 FROM tomcat:8.0-jre8
 MAINTAINER "Moses <abc@gmail.com>"
 
-# remove preinstalled webapps 
+ --- remove preinstalled webapps 
 RUN rm -fr /usr/local/tomcat/webapps/ROOT
 RUN rm -fr /usr/local/tomcat/webapps/host-manager
 RUN rm -fr /usr/local/tomcat/webapps/manager
@@ -33,7 +32,7 @@ You can customize the Dockerfile as needed for example changing the maintainer n
 **Build the Docker Image**
 **Set up the project** 
 1.	Using commend navigate to the directory where you would like to the project source code from Github and type in the command bellow:
-git clone https://github.com/openjamoses/wekarest.git
+git clone https://github.com/openjamoses/weka_rest_version.git
 2.	Navigate to the project directory you have just cloned:
 cd wekarest
 3.	Compile the war (Web Application Archive) file with maven
