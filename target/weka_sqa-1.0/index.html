@@ -1,0 +1,73 @@
+<!-- HTML for static distribution bundle build -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JGU WEKA REST services Swagger UI</title>
+    <!-- link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700|Source+Code+Pro:300,600|Titillium+Web:400,600,700" rel="stylesheet" -->
+    <link rel="stylesheet" type="text/css" href="./swagger-ui/swagger-ui.css">
+    <link rel="stylesheet" type="text/css" href="./swagger-ui/jguweka.css">
+
+    <link rel="icon" type="image/png" href="./swagger-ui/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="./swagger-ui/favicon-16x16.png" sizes="16x16" />
+    <style>
+    html
+    {
+      box-sizing: border-box;
+      overflow: -moz-scrollbars-vertical;
+      overflow-y: scroll;
+    }
+    *,
+    *:before,
+    *:after
+    {
+      box-sizing: inherit;
+    }
+
+    body {
+      margin:0;
+      background: #fafafa;
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="swagger-ui"></div>
+
+<script src="./swagger-ui/swagger-ui-bundle.js"> </script>
+<script src="./swagger-ui/swagger-ui-standalone-preset.js"> </script>
+<!-- script src="https://code.jquery.com/jquery-latest.js"></script -->
+<script>
+window.onload = function() {
+    // Build a system
+    var base_url = window.location.origin;
+    var swagger_url = base_url + "/openapi/openapi.json";
+    const ui = SwaggerUIBundle({
+    url: swagger_url,
+    dom_id: '#swagger-ui',
+    deepLinking: true,
+    tagsSorter: 'alpha',
+    operationsSorter: 'alpha',
+    presets: [
+      SwaggerUIBundle.presets.apis,
+      SwaggerUIStandalonePreset
+    ],
+    plugins: [
+      SwaggerUIBundle.plugins.DownloadUrl
+    ],
+    layout: "StandaloneLayout"
+    })
+
+    window.ui = ui
+    document.getElementsByClassName('topbar-wrapper')[0].getElementsByTagName('img')[0].src = "./swagger-ui/jgu-logo.png";
+    document.getElementsByClassName('topbar-wrapper')[0].getElementsByTagName('img')[0].width = "76";
+    document.getElementsByClassName('topbar-wrapper')[0].getElementsByTagName('img')[0].height = "53";
+    document.getElementsByClassName('topbar-wrapper')[0].getElementsByTagName('span')[0].innerHTML = "weka-rest-ui";
+}
+
+
+</script>
+</body>
+
+</html>

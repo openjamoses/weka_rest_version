@@ -1,49 +1,60 @@
-# JGU WEKA Rest Service
+**Prepare the Dockerfile**
 
-RESTful API Webservice to WEKA Machine Learning Algorithms.
-This webservice provides an [OpenRiskNet](https://openrisknet.org/) compliant REST interface to machine learning algorithms from the WEKA Java Library.
-This application is developed by the [Institute of Computer Science](http://www.datamining.informatik.uni-mainz.de/) at the Johannes Gutenberg University Mainz.
-OpenRiskNet is funded by the European Commission GA 731075. WEKA is developed by the [Machine Learning Group](https://www.cs.waikato.ac.nz/ml/index.html) at the University of Waikato.
+Please note that Dockerfile always starts with a default image called base-image examples include things like a tomcat, red hat image or an Ubuntu base-image. This is the building block for our image, this image band can be expanded to as lean as you would like, as we can add things to this image or build “layers”.
 
-See [Documentation](https://jguwekarest.github.io/jguwekarest/), [Issue Tracker](https://github.com/jguwekarest/jguwekarest/issues) and [Code](https://github.com/jguwekarest/jguwekarest) at GitHub.
+As mentioned above, the current docker image is built with a simple Dockerfile that uses a tomcat base-image from the official Apache Tomcat repository. To make our base image Ubuntu, add this line with the:
+FROM tomcat:8.0-jre8
+The next step
+Now we need to remove all the pre-installed webapps by using a command RUN rm.
+Dockerfile removes all pre-installed webapps from tomcat and copies the WEKA Rest service war file to /usr/local/tomcat/webapps/ROOT.war as the main application.
 
-## Quickstart
-This is an a swagger-enabled JAX-RS server. The API is in OpenAPI Specification Version 3.0.1 [OpenAPI-Specification 3.0.1](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md)
-The service uses the [JAX-RS](https://jax-rs-spec.java.net/) framework.
+We shall run our application on port 8080. To do that lets use the docker EXPOSE command to open up that port as: 
 
-To run a simple local environment, please execute the following:
+EXPOSE 8080
 
-```
-mvn clean package jetty:run
-```
+The final Dockerfile should look like this:
 
-You can then view the full Rest API on Swagger-UI here:
+FROM tomcat:8.0-jre8
+MAINTAINER "Moses <abc@gmail.com>"
 
-```
-http://0.0.0.0:8081
-```
+# remove preinstalled webapps 
+RUN rm -fr /usr/local/tomcat/webapps/ROOT
+RUN rm -fr /usr/local/tomcat/webapps/host-manager
+RUN rm -fr /usr/local/tomcat/webapps/manager
+RUN rm -fr /usr/local/tomcat/webapps/docs
+RUN rm -fr /usr/local/tomcat/webapps/examples
 
-To connect the server to a mongodb database you can use a standard mongo docker image pulled from docker hub:
+COPY target/weka_sqa-1.0war /usr/local/tomcat/webapps/ROOT.war
 
-```
-docker pull mongo
-docker run -d mongo
-```
+EXPOSE 8080
 
-### *curl* Example
+You can customize the Dockerfile as needed for example changing the maintainer name and email address, Specify the war filename and the version corresponding to the changes in the pom.xml
 
-POST an arff file to the WEKA BayesNet algorithm using curl:
-```
-curl  -X POST -H "Content-Type: multipart/form-data" -H "Accept:text/x-arff" -F "file=@/yourpathtowekadata/weka-3-8-1/data/weather.nominal.arff;" -F "estimatorParams=0.5"  -F "searchAlgorithm=local.K2" -F useADTree=0 -F "estimator=SimpleEstimator" -F searchParams='-P 1 -S BAYES' http://0.0.0.0:8081/algorithm/BayesNet
-```
+**Build the Docker Image**
+**Set up the project** 
+1.	Using commend navigate to the directory where you would like to the project source code from Github and type in the command bellow:
+git clone https://github.com/openjamoses/wekarest.git
+2.	Navigate to the project directory you have just cloned:
+cd wekarest
+3.	Compile the war (Web Application Archive) file with maven
+mvn clean package
+4.	To build the docker image with the weka_sqa
+            docker build . -t weka_sqa
+5.	You can go ahead and verify that image built correctly with:
+docker images 
+6.	Now, let’s bring up a container called weka_sqa_container which will be based on the image weka_sqa using the docker command.
+docker run -t -p 8080:8080 --name weka_sqa_container weka_sqa
 
-## Documentation
+To run the container in the background, add -d to your docker run command. 
+Use ctrl + c to exit the container. 
+Now use the command docker ps -a. to view your container
+Showing you the URL link, you can assess the page as:
+0.0.0.0:8080
 
- * Full example for a **[local or server hosted development environment](./doc/DockerizedDevEnvSetup.md).** 
- * Docker Deployment: **[Build the Docker image with a Dockerfile](./doc/DockerImageDeployment.md)**.
- * Running tests: **[Run Tests](./doc/Testing.md)**.
- * OpenShift Deployment: **[Deployment in OpenShift](./openshift/README.md)**.
- * Commandline Examples with Curl: **[Curl Examples](./doc/CommandlineCurlExamples.md)**.
- * Authentication: **[Keycloak Integration](./doc/TomcatKeycloakSetup.md)**.
- * Java Docs on gh-pages: **[JavaDocs](https://jguwekarest.github.io/jguwekarest/javadoc/index.html)**.
- 
+**Tag your Image** 
+First, list the image and find the one you built. Next, tag the image by using the image id (my id is: 5ua43ad124rf2) and tagging it with your docker username a name of your choice. My docker username is username and the name we tag it with is username /weka sqa_image:1.0 . Make sure you specify the tag name and tag version, separated by a colon (:).
+docker tag 5ua43ad124rf2 username /weka_sqa_image:1.0 
+
+**Push the image to the public Docker Hub**
+Use the same name you used to tag the image:
+docker push username/weka_sqa_image:1.0 
